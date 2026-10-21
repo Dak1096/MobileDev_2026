@@ -1,0 +1,51 @@
+<resources>
+    <string name="app_name">EmailClient</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="login">Login</string>
+    <string name="error_email_required">Enter your email</string>
+    <string name="error_password_required">Enter your password</string>
+    <string name="error_wrong_credentials">Wrong email or password</string>
+
+    <string name="sign_in">Sign in</string>
+    <string name="sign_in_subtitle">to continue to EmailClient</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="next">Next</string>
+    <string name="error_load_failed">Couldn\'t load emails. Check your connection.</string>
+
+    <string name="menu_inbox">Inbox</string>
+    <string name="menu_sent">Sent</string>
+    <string name="menu_drafts">Drafts</string>
+    <string name="menu_spam">Spam</string>
+    <string name="menu_trash">Trash</string>
+    <string name="compose_email">Compose email</string>
+
+    <string name="compose_title">Compose</string>
+    <string name="hint_to">To</string>
+    <string name="hint_subject">Subject</string>
+    <string name="hint_body">Compose email</string>
+    <string name="send">Send</string>
+    <string name="error_to_required">Please enter a recipient</string>
+    <string name="error_subject_required">Please enter a subject</string>
+    <string name="sent_ok">Email sent</string>
+    <string name="error_send_failed">Couldn\'t send email</string>
+    <string name="detail_title">Message</string>
+    <string name="detail_from">From</string>
+
+    <string name="delete">Delete</string>
+    <string name="delete_forever">Delete forever</string>
+    <string name="report_spam">Report spam</string>
+    <string name="not_spam">Not spam</string>
+    <string name="moved_trash">Moved to Trash</string>
+    <string name="moved_spam">Reported as spam</string>
+    <string name="moved_inbox">Moved to Inbox</string>
+    <string name="deleted_forever">Deleted forever</string>
+    <string name="draft_saved">Draft saved</string>
+
+    <string name="forgot_title">Account recovery</string>
+    <string name="forgot_subtitle">Enter your email and we\'ll send you instructions to reset your password</string>
+    <string name="back_to_login">Back to sign in</string>
+    <string name="check_inbox">Check your email</string>
+    <string name="done_message">If an account exists for %1$s, we\'ve sent password reset instructions.</string>
+    <string name="error_invalid_email">Please enter a valid email</string>
+</resources>
