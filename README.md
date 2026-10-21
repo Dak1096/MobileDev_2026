@@ -1,6 +1,6 @@
 # Email-Client
 
-Ứng dụng **email client trên Android** (Java + XML layouts), được xây dựng cho đồ án môn Lập trình di động. Ứng dụng cho phép đăng nhập, xem hộp thư, đọc chi tiết thư, soạn và gửi thư, đồng thời tự động lưu bản nháp.
+Ứng dụng **email client trên Android** (Java + XML layouts). Ứng dụng cho phép đăng nhập, xem hộp thư, đọc chi tiết thư, soạn và gửi thư, đồng thời tự động lưu bản nháp.
 
 ## Tính năng
 
