@@ -44,3 +44,7 @@ app/src/main/
 
 - **`ApiClient`** là cơ chế GET/POST chung, ở tầng **transport** (làm sao gửi).
 - **`EmailRepository`** là lớp nghiệp vụ cụ thể, dùng `ApiClient` để thực hiện các thao tác email, ở tầng **domain** (gửi gì, xử lý thế nào).
+- **Trước login:** `LoginActivity` — form đăng nhập (có `ForgotPasswordActivity` cho quên mật khẩu).
+- **Sau login:** `InboxActivity` — khung chính (Toolbar + Drawer + FAB), từ đây chọn folder và mở màn soạn thư.
+- **Trong khung:** `MailListFragment` — danh sách thư, được thay theo folder đang chọn.
+- **Mở thành màn hình riêng (qua Intent):** `ComposeActivity` (soạn thư, mở lại nháp) và `MailDetailActivity` (xem chi tiết thư), được gọi từ FAB hoặc khi bấm một thư trong danh sách.
