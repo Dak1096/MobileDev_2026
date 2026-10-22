@@ -48,3 +48,13 @@ app/src/main/
 - **Sau login:** `InboxActivity` : khung chính (Toolbar + Drawer + FAB), từ đây chọn folder và mở màn soạn thư.
 - **Trong khung:** `MailListFragment` : danh sách thư, được thay theo folder đang chọn.
 - **Mở thành màn hình riêng (qua Intent):** `ComposeActivity` (soạn thư, mở lại nháp) và `MailDetailActivity` (xem chi tiết thư), được gọi từ FAB hoặc khi bấm một thư trong danh sách.
+
+  Khi mở INBOX:
+
+1. `InboxActivity` → `MailListFragment.newInstance("INBOX")`.
+2. Fragment `onResume()` → `EmailRepository.fetchFolder("INBOX", callback)`.
+3. Repository → `ApiClient.get("/comments?_limit=30")` → JSONPlaceholder trả 30 comment giả (bất đồng bộ, kết quả báo về qua callback).
+4. Repository parse JSON → tạo `List<Email>` → lọc `hidden`, chèn thư local lên đầu → báo kết quả về Fragment.
+5. Fragment tạo `EmailAdapter(list)`, gọi `setFolder("INBOX")`, gắn vào RecyclerView → hiện danh sách thư.
+
+Fragment chỉ "trưng bày"; JSONPlaceholder sinh dữ liệu giả, `ApiClient` lo gọi mạng, `EmailRepository` xử lý thành dữ liệu thư.
