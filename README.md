@@ -57,4 +57,3 @@ app/src/main/
 4. Repository parse JSON → tạo `List<Email>` → lọc `hidden`, chèn thư local lên đầu → báo kết quả về Fragment.
 5. Fragment tạo `EmailAdapter(list)`, gọi `setFolder("INBOX")`, gắn vào RecyclerView → hiện danh sách thư.
 
-Fragment chỉ "trưng bày"; JSONPlaceholder sinh dữ liệu giả, `ApiClient` lo gọi mạng, `EmailRepository` xử lý thành dữ liệu thư.
