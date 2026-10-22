@@ -40,3 +40,7 @@ app/src/main/
     ├── layout/                      # activity_*.xml, fragment_mail_list.xml, item_email.xml
     └── values/                      # strings.xml, colors.xml, themes.xml
 ```
+## Phân tầng
+
+- **`ApiClient`** là cơ chế GET/POST chung, ở tầng **transport** (làm sao gửi).
+- **`EmailRepository`** là lớp nghiệp vụ cụ thể, dùng `ApiClient` để thực hiện các thao tác email, ở tầng **domain** (gửi gì, xử lý thế nào).
