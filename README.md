@@ -49,7 +49,7 @@ app/src/main/
 - **Trong khung:** `MailListFragment` : danh sách thư, được thay theo folder đang chọn.
 - **Mở thành màn hình riêng (qua Intent):** `ComposeActivity` (soạn thư, mở lại nháp) và `MailDetailActivity` (xem chi tiết thư), được gọi từ FAB hoặc khi bấm một thư trong danh sách.
 
-  Khi mở INBOX:
+## Khi mở INBOX
 
 1. `InboxActivity` → `MailListFragment.newInstance("INBOX")`.
 2. Fragment `onResume()` → `EmailRepository.fetchFolder("INBOX", callback)`.
