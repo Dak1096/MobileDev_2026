@@ -58,9 +58,30 @@ app/src/main/
 5. Fragment tạo `EmailAdapter(list)`, gọi `setFolder("INBOX")`, gắn vào RecyclerView → hiện danh sách thư
 
 `AndroidManifest.xml`
-- Khai báo quyền `INTERNET` (bắt buộc để app gọi mạng, tức gửi/nhận thư qua API).
-- Đăng ký đủ 5 Activity: `LoginActivity`, `InboxActivity`, `ComposeActivity`, `MailDetailActivity`, `ForgotPasswordActivity`. Activity nào thiếu khai báo thì khi mở bằng Intent app sẽ crash.
-- `LoginActivity` là **màn hình khởi động** (intent-filter `MAIN` + `LAUNCHER`), nên phải đặt `exported="true"`.
-- `exported="false"` ở 4 màn còn lại: chỉ app này mới mở được, app khác không gọi vào được (bảo mật).
-- `windowSoftInputMode="adjustResize"` ở Login, Inbox, Compose: khi bàn phím hiện lên, layout co lại để các ô nhập không bị che.
+- Khai báo quyền `INTERNET` (bắt buộc để app gọi mạng, tức gửi/nhận thư qua API)
+- Đăng ký đủ 5 Activity: `LoginActivity`, `InboxActivity`, `ComposeActivity`, `MailDetailActivity`, `ForgotPasswordActivity` Activity nào thiếu khai báo thì khi mở bằng Intent app sẽ crash
+- `LoginActivity` là **màn hình khởi động** (intent-filter `MAIN` + `LAUNCHER`), nên phải đặt `exported="true"`
+- `exported="false"` ở 4 màn còn lại: chỉ app này mới mở được, app khác không gọi vào được (bảo mật)
+- `windowSoftInputMode="adjustResize"` ở Login, Inbox, Compose: khi bàn phím hiện lên, layout co lại để các ô nhập không bị che
+
+  ## Luồng MailDetailActivity
+
+```text
+Mở MailDetailActivity
+│
+├─ Đọc Intent extras (sender, subject, date, body, folder)
+├─ Hiển thị lên TextView
+├─ Xác định ngữ cảnh: inTrash / inSpam
+├─ Đổi label nút (Xóa → "Xóa vĩnh viễn", Spam → "Không phải spam")
+│
+├─ Bấm Xóa
+│    ├─ Đang ở Trash → deleteForever()
+│    └─ Ngược lại    → moveEmail → "TRASH"
+│
+└─ Bấm Spam
+     ├─ Đang ở Spam  → moveEmail → "INBOX"
+     └─ Ngược lại    → moveEmail → "SPAM"
+
+Sau mỗi thao tác: finish() → quay lại màn trước
+```
 
