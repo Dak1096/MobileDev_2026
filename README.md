@@ -84,4 +84,138 @@ Mở MailDetailActivity
 
 Sau mỗi thao tác: finish() → quay lại màn trước
 ```
+## Sơ đồ luồng hoạt động
 
+### 1. Luồng tổng thể của app
+
+```mermaid
+flowchart TD
+    L["LoginActivity<br/>(MAIN + LAUNCHER)"] -->|Đăng nhập OK| I[InboxActivity]
+    L -->|Quên mật khẩu| F[ForgotPasswordActivity]
+    F -->|Xong| L
+    I -->|Bấm một thư| D[MailDetailActivity]
+    I -->|FAB hoặc bấm một nháp| C[ComposeActivity]
+    D -->|finish| I
+    C -->|finish| I
+```
+
+**Entry point duy nhất:** `LoginActivity` (intent-filter `MAIN` + `LAUNCHER`).
+
+### 2. LoginActivity: đăng nhập
+
+```mermaid
+flowchart TD
+    A[Nhập email] --> B{Bấm nút nào?}
+    B -->|Đăng nhập| C[Gọi API kiểm tra tài khoản]
+    C -->|Hợp lệ| D["startActivity(InboxActivity) + finish()"]
+    C -->|Không hợp lệ hoặc lỗi mạng| E[Toast báo lỗi]
+    B -->|Quên mật khẩu| F[Mở ForgotPasswordActivity]
+```
+
+- `windowSoftInputMode="adjustResize"`: bàn phím không che ô nhập.
+- Đăng nhập xong có `finish()`, nên bấm Back không quay lại màn Login.
+
+### 3. ForgotPasswordActivity: quên mật khẩu
+
+```mermaid
+flowchart LR
+    A[Nhập email] --> B[Gửi yêu cầu reset] --> C[Toast kết quả] --> D[finish → quay lại Login]
+```
+
+### 4. InboxActivity: hộp thư đến
+
+```mermaid
+flowchart TD
+    A[onCreate: dựng Toolbar + Drawer + FAB] --> B[Mặc định nạp INBOX]
+    B --> C[MailListFragment hiển thị danh sách]
+    C -->|Chọn folder ở Drawer| D[Thay MailListFragment theo folder]
+    D --> C
+    C -->|Bấm thư ở Drafts| E[ComposeActivity, kèm draftKey]
+    C -->|Bấm thư ở folder khác| F[MailDetailActivity]
+    A -->|Bấm FAB| G[ComposeActivity, form trống]
+```
+
+Intent extras khi mở `MailDetailActivity`:
+
+| Key | Giá trị |
+| --- | --- |
+| `sender` | Địa chỉ người gửi |
+| `subject` | Tiêu đề |
+| `date` | Ngày gửi |
+| `body` | Nội dung |
+| `folder` | Tên folder hiện tại (ví dụ Inbox, Trash, Spam) |
+
+### 5. MailDetailActivity: chi tiết email
+
+```mermaid
+flowchart TD
+    A[Mở MailDetailActivity] --> B[Đọc Intent extras]
+    B --> C[Hiển thị lên TextView]
+    C --> D[Xác định ngữ cảnh: inTrash / inSpam]
+    D --> E[Đổi label nút theo ngữ cảnh]
+    E --> F{Bấm nút nào?}
+    F -->|Xóa| G{Đang ở Trash?}
+    G -->|Có| H[deleteForever]
+    G -->|Không| I["moveEmail → TRASH"]
+    F -->|Spam| J{Đang ở Spam?}
+    J -->|Có| K["moveEmail → INBOX"]
+    J -->|Không| L["moveEmail → SPAM"]
+    H --> M[finish → quay lại màn trước]
+    I --> M
+    K --> M
+    L --> M
+```
+
+Hành vi nút theo thư mục:
+
+| Thư mục hiện tại | Nút Xóa | Nút Spam |
+| --- | --- | --- |
+| Inbox | Chuyển vào Trash | Chuyển vào Spam |
+| Trash | Xóa vĩnh viễn (`deleteForever`) | Chuyển vào Spam |
+| Spam | Chuyển vào Trash | Chuyển về Inbox ("Không phải spam") |
+
+- Hàm `s(String v)` chống `NullPointerException`: trả `""` nếu `null`.
+- `folder.contains("Trash")` / `contains("Spam")` xác định ngữ cảnh linh hoạt, không cần khớp tuyệt đối.
+
+### 6. ComposeActivity: soạn email
+
+```mermaid
+flowchart TD
+    A[onCreate: đọc extras, điền sẵn 3 ô] --> B[Chờ người dùng thao tác]
+    B -->|Bấm Gửi| C{to rỗng?}
+    C -->|Có| D[Toast error_to_required] --> B
+    C -->|Không| E{subject rỗng?}
+    E -->|Có| F[Toast error_subject_required] --> B
+    E -->|Không| G[Tắt nút Gửi + sendEmail]
+    G -->|Thành công| H["Bật lại nút, sent = true, xóa nháp cũ nếu có, Toast sent_ok, finish"]
+    G -->|Thất bại hoặc lỗi| I[Bật lại nút + Toast error_send_failed] --> B
+    B -->|Back / thoát chưa gửi| J["onPause: isFinishing và chưa sent?"]
+    J -->|Không| K[Không lưu nháp]
+    J -->|Có, còn nội dung| L[saveDraft + Toast draft_saved]
+    J -->|Có, hết nội dung, có draftKey| M[discardDraft]
+    J -->|Có, hết nội dung, không draftKey| N[Không làm gì]
+```
+
+- `adjustResize`: bàn phím không che ô Body.
+- Cờ `sent` giúp phân biệt "đóng vì đã gửi" và "đóng vì bỏ dở" (chỉ bỏ dở mới lưu nháp).
+- Cần quyền `INTERNET` (đã khai báo trong Manifest).
+
+### 7. Tương tác giữa các lớp
+
+```mermaid
+flowchart LR
+    UI["Activity / Fragment / Adapter"] --> R[EmailRepository]
+    R --> A[ApiClient]
+    A --> S["Server giả (JSONPlaceholder)"]
+    R --> LC["Dữ liệu local: thư local + hidden"]
+```
+
+### Bảng tóm tắt
+
+| Màn hình | Vào từ | Hành động chính | Ra tới |
+| --- | --- | --- | --- |
+| `LoginActivity` | Launcher | Đăng nhập, Quên mật khẩu | Inbox / ForgotPassword |
+| `ForgotPasswordActivity` | Login | Gửi yêu cầu reset | Quay lại Login |
+| `InboxActivity` | Login | Xem danh sách, chọn thư, soạn thư | MailDetail / Compose |
+| `MailDetailActivity` | Inbox | Xóa / Spam theo ngữ cảnh | Quay lại Inbox |
+| `ComposeActivity` | Inbox | Soạn, gửi, tự lưu nháp | Quay lại Inbox |
