@@ -129,6 +129,35 @@ Các thao tác gọi mạng (đăng nhập, tải danh sách thư, gửi thư) c
 - `LoginActivity` là **màn hình khởi động** (intent-filter `MAIN` + `LAUNCHER`), nên phải đặt `exported="true"`
 - `exported="false"` ở 4 màn còn lại: chỉ app này mới mở được, app khác không gọi vào được (bảo mật)
 - `windowSoftInputMode="adjustResize"` ở Login, Inbox, Compose: khi bàn phím hiện lên, layout co lại để các ô nhập không bị che
+
+## Dữ liệu local trong `EmailRepository`
+
+`local` là một `Map` lưu thư theo **tên folder**, đóng vai trò "cơ sở dữ liệu in-memory" của app:
+
+```text
+┌─────────────────────────────────────────────┐
+│  local (Map<String, List<Email>>)           │
+├─────────────────────────────────────────────┤
+│  "INBOX"  →  [Email1, Email2, Email3]       │
+│  "SENT"   →  [Email4, Email5]               │
+│  "DRAFTS" →  [Email6]                       │
+│  "SPAM"   →  []                             │
+│  "TRASH"  →  [Email7, Email8]               │
+└─────────────────────────────────────────────┘
+```
+
+Mọi thao tác đều bắt đầu bằng việc **tìm folder theo khóa**:
+
+| Thao tác | Cách làm | Chi phí |
+| --- | --- | --- |
+| Lấy thư của Inbox | `local.get("INBOX")` | Tìm folder O(1) |
+| Thêm thư vào Spam | `local.get("SPAM").add(email)` | Tìm folder O(1), thêm vào cuối danh sách O(1) |
+| Xóa thư khỏi Trash | `local.get("TRASH").remove(email)` | Tìm folder O(1), tìm thư trong danh sách O(n) |
+| Chuyển Inbox → Trash | `remove` khỏi Inbox, thêm khóa vào `hidden`, `add` vào Trash | Tìm folder O(1), `remove` O(n) |
+| Kiểm tra folder tồn tại | `local.containsKey("INBOX")` | O(1) |
+
+- `hidden` là tập khóa các thư đã xóa hoặc chuyển đi. Server giả vẫn trả thư đó về, nên `fetchFolder` phải lọc chúng ra.
+- Mỗi folder chỉ có vài chục thư nên O(n) không ảnh hưởng hiệu năng thực tế.
   
 ## Sơ đồ luồng hoạt động
 
