@@ -63,8 +63,64 @@ app/src/main/
 - `LoginActivity` là **màn hình khởi động** (intent-filter `MAIN` + `LAUNCHER`), nên phải đặt `exported="true"`
 - `exported="false"` ở 4 màn còn lại: chỉ app này mới mở được, app khác không gọi vào được (bảo mật)
 - `windowSoftInputMode="adjustResize"` ở Login, Inbox, Compose: khi bàn phím hiện lên, layout co lại để các ô nhập không bị che
+  
+## Sơ đồ luồng hoạt động
 
-  ## Luồng MailDetailActivity
+### 1. Luồng tổng thể của app
+
+```text
+LoginActivity (MAIN + LAUNCHER, màn hình khởi động)
+├─ Đăng nhập OK ───► InboxActivity
+│                    ├─ Bấm một thư ────────────► MailDetailActivity ──finish──► Inbox
+│                    └─ FAB hoặc bấm một nháp ──► ComposeActivity ─────finish──► Inbox
+└─ Quên mật khẩu ──► ForgotPasswordActivity ──► quay lại Login
+```
+
+**Entry point duy nhất:** `LoginActivity` (intent-filter `MAIN` + `LAUNCHER`).
+
+### 2. LoginActivity: đăng nhập
+
+```text
+Nhập email
+├─ Bấm Đăng nhập
+│    ├─ Gọi API kiểm tra tài khoản
+│    ├─ Hợp lệ ────────────────► startActivity(InboxActivity) + finish()
+│    └─ Không hợp lệ / lỗi mạng ► Toast báo lỗi
+└─ Bấm Quên mật khẩu ► mở ForgotPasswordActivity
+```
+
+- `windowSoftInputMode="adjustResize"`: bàn phím không che ô nhập.
+- Đăng nhập xong có `finish()`, nên bấm Back không quay lại màn Login.
+
+### 3. ForgotPasswordActivity: quên mật khẩu
+
+```text
+Nhập email ► Gửi yêu cầu reset ► Toast kết quả ► finish() quay lại Login
+```
+
+### 4. InboxActivity: hộp thư đến
+
+```text
+onCreate: dựng Toolbar + Drawer + FAB
+├─ Mặc định nạp INBOX ► MailListFragment hiển thị danh sách
+├─ Chọn folder ở Drawer ► thay MailListFragment theo folder
+├─ Bấm thư
+│    ├─ Folder Drafts ───► ComposeActivity (kèm draftKey)
+│    └─ Folder khác ─────► MailDetailActivity
+└─ Bấm FAB ► ComposeActivity (form trống)
+```
+
+Intent extras khi mở `MailDetailActivity`:
+
+| Key | Giá trị |
+| --- | --- |
+| `sender` | Địa chỉ người gửi |
+| `subject` | Tiêu đề |
+| `date` | Ngày gửi |
+| `body` | Nội dung |
+| `folder` | Tên folder hiện tại (ví dụ Inbox, Trash, Spam) |
+
+### 5. MailDetailActivity: chi tiết email
 
 ```text
 Mở MailDetailActivity
@@ -84,94 +140,6 @@ Mở MailDetailActivity
 
 Sau mỗi thao tác: finish() → quay lại màn trước
 ```
-## Sơ đồ luồng hoạt động
-
-### 1. Luồng tổng thể của app
-
-```mermaid
-flowchart TD
-    L["LoginActivity - MAIN và LAUNCHER"]
-    F["ForgotPasswordActivity"]
-    I["InboxActivity"]
-    D["MailDetailActivity"]
-    C["ComposeActivity"]
-    L -->|"Đăng nhập OK"| I
-    L -->|"Quên mật khẩu"| F
-    F -->|"Xong"| L
-    I -->|"Bấm một thư"| D
-    I -->|"FAB hoặc bấm một nháp"| C
-    D -->|"finish"| I
-    C -->|"finish"| I
-```
-
-**Entry point duy nhất:** `LoginActivity` (intent-filter `MAIN` + `LAUNCHER`).
-
-### 2. LoginActivity: đăng nhập
-
-```mermaid
-flowchart TD
-    A["Nhập email"] --> B{"Bấm nút nào?"}
-    B -->|"Đăng nhập"| C["Gọi API kiểm tra tài khoản"]
-    C -->|"Hợp lệ"| D["startActivity InboxActivity rồi finish"]
-    C -->|"Không hợp lệ hoặc lỗi mạng"| E["Toast báo lỗi"]
-    B -->|"Quên mật khẩu"| F["Mở ForgotPasswordActivity"]
-```
-
-- `windowSoftInputMode="adjustResize"`: bàn phím không che ô nhập.
-- Đăng nhập xong có `finish()`, nên bấm Back không quay lại màn Login.
-
-### 3. ForgotPasswordActivity: quên mật khẩu
-
-```mermaid
-flowchart LR
-    A["Nhập email"] --> B["Gửi yêu cầu reset"]
-    B --> C["Toast kết quả"]
-    C --> D["finish, quay lại Login"]
-```
-
-### 4. InboxActivity: hộp thư đến
-
-```mermaid
-flowchart TD
-    A["onCreate - dựng Toolbar, Drawer, FAB"] --> B["Mặc định nạp INBOX"]
-    B --> C["MailListFragment hiển thị danh sách"]
-    C -->|"Chọn folder ở Drawer"| D["Thay MailListFragment theo folder"]
-    D --> C
-    C -->|"Bấm thư ở Drafts"| E["ComposeActivity, kèm draftKey"]
-    C -->|"Bấm thư ở folder khác"| F["MailDetailActivity"]
-    A -->|"Bấm FAB"| G["ComposeActivity, form trống"]
-```
-
-Intent extras khi mở `MailDetailActivity`:
-
-| Key | Giá trị |
-| --- | --- |
-| `sender` | Địa chỉ người gửi |
-| `subject` | Tiêu đề |
-| `date` | Ngày gửi |
-| `body` | Nội dung |
-| `folder` | Tên folder hiện tại (ví dụ Inbox, Trash, Spam) |
-
-### 5. MailDetailActivity: chi tiết email
-
-```mermaid
-flowchart TD
-    A["Mở MailDetailActivity"] --> B["Đọc Intent extras"]
-    B --> C["Hiển thị lên TextView"]
-    C --> D["Xác định ngữ cảnh inTrash, inSpam"]
-    D --> E["Đổi label nút theo ngữ cảnh"]
-    E --> F{"Bấm nút nào?"}
-    F -->|"Xóa"| G{"Đang ở Trash?"}
-    G -->|"Có"| H["deleteForever"]
-    G -->|"Không"| I["moveEmail sang TRASH"]
-    F -->|"Spam"| J{"Đang ở Spam?"}
-    J -->|"Có"| K["moveEmail sang INBOX"]
-    J -->|"Không"| L["moveEmail sang SPAM"]
-    H --> M["finish, quay lại màn trước"]
-    I --> M
-    K --> M
-    L --> M
-```
 
 Hành vi nút theo thư mục:
 
@@ -186,24 +154,27 @@ Hành vi nút theo thư mục:
 
 ### 6. ComposeActivity: soạn email
 
-```mermaid
-flowchart TD
-    A["onCreate - đọc extras, điền sẵn 3 ô"] --> B["Chờ người dùng thao tác"]
-    B -->|"Bấm Gửi"| C{"to rỗng?"}
-    C -->|"Có"| D["Toast error_to_required"]
-    D --> B
-    C -->|"Không"| E{"subject rỗng?"}
-    E -->|"Có"| F["Toast error_subject_required"]
-    F --> B
-    E -->|"Không"| G["Tắt nút Gửi và gọi sendEmail"]
-    G -->|"Thành công"| H["Bật lại nút, sent = true, xóa nháp cũ nếu có, Toast sent_ok, finish"]
-    G -->|"Thất bại hoặc lỗi"| I["Bật lại nút, Toast error_send_failed"]
-    I --> B
-    B -->|"Back hoặc thoát chưa gửi"| J{"onPause - isFinishing và chưa sent?"}
-    J -->|"Không"| K["Không lưu nháp"]
-    J -->|"Có, còn nội dung"| L["saveDraft, Toast draft_saved"]
-    J -->|"Có, hết nội dung, có draftKey"| M["discardDraft"]
-    J -->|"Có, hết nội dung, không draftKey"| N["Không làm gì"]
+```text
+onCreate: đọc extras (draftKey, to, subject, body) ► điền sẵn 3 ô ► chờ người dùng
+
+Bấm Gửi
+├─ to rỗng ──────► Toast error_to_required (quay lại chờ)
+├─ subject rỗng ─► Toast error_subject_required (quay lại chờ)
+└─ Hợp lệ ► tắt nút Gửi ► EmailRepository.sendEmail
+     ├─ Thành công (ok = true)
+     │    ├─ Bật lại nút, sent = true
+     │    ├─ draftKey != null ► discardDraft (xóa nháp cũ)
+     │    └─ Toast sent_ok ► finish()
+     ├─ Thất bại (ok = false) ► bật lại nút + Toast error_send_failed (cho thử lại)
+     └─ Lỗi (onError) ───────► bật lại nút + Toast error_send_failed (cho thử lại)
+
+Back / thoát khi chưa gửi ► onPause
+├─ Không (isFinishing sai, hoặc sent = true) ► không lưu nháp
+└─ Có (isFinishing đúng và sent = false) ► đọc lại to, subject, body
+     ├─ Còn nội dung ─────────────────────► saveDraft + Toast draft_saved
+     ├─ Hết nội dung, draftKey != null ───► discardDraft
+     └─ Hết nội dung, draftKey = null ────► không làm gì
+     (cuối cùng: đóng màn hình)
 ```
 
 - `adjustResize`: bàn phím không che ô Body.
@@ -212,12 +183,17 @@ flowchart TD
 
 ### 7. Tương tác giữa các lớp
 
-```mermaid
-flowchart LR
-    UI["Activity, Fragment, Adapter"] --> R["EmailRepository"]
-    R --> A["ApiClient"]
-    A --> S["Server giả JSONPlaceholder"]
-    R --> LC["Dữ liệu local - thư local và hidden"]
+```text
+Activity / Fragment / Adapter
+        │
+        ▼
+ EmailRepository ──► dữ liệu local (thư local + hidden)
+        │
+        ▼
+    ApiClient
+        │
+        ▼
+ Server giả (JSONPlaceholder)
 ```
 
 ### Bảng tóm tắt
