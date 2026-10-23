@@ -188,7 +188,7 @@ Các thao tác gọi mạng (đăng nhập, tải danh sách thư, gửi thư) c
 
 Mọi thao tác đều bắt đầu bằng việc **tìm folder theo khóa**:
 
-| Thao tác | Cách làm | Chi phí |
+| Thao tác | Cách làm | Độ phức tạp thuật toán |
 | --- | --- | --- |
 | Lấy thư của Inbox | `local.get("INBOX")` | Tìm folder O(1) |
 | Thêm thư vào Spam | `local.get("SPAM").add(email)` | Tìm folder O(1), thêm vào cuối danh sách O(1) |
