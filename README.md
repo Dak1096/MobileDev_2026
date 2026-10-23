@@ -5,7 +5,7 @@
 ## Tính năng
 
 - **Đăng nhập** bằng địa chỉ email
-- **Quên mật khẩu**: màn hình nhập email để nhận hướng dẫn đặt lại (hiện mới là giao diện, chưa kết nối backend)
+- **Quên mật khẩu**: màn hình nhập email để nhận hướng dẫn đặt lại
 - **Hộp thư (Inbox)** hiển thị danh sách thư theo từng thư mục
 - **Xem chi tiết thư**
 - **Soạn và gửi thư** (kiểm tra người nhận và tiêu đề trước khi gửi, chặn bấm gửi nhiều lần)
