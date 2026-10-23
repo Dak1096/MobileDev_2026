@@ -40,6 +40,35 @@ app/src/main/
     ├── layout/                      # activity_*.xml, fragment_mail_list.xml, item_email.xml
     └── values/                      # strings.xml, colors.xml, themes.xml
 ```
+## Tài nguyên giao diện (`res/`)
+
+### `layout/`: bố cục từng màn hình
+
+| File | Dùng cho | Nội dung cốt lõi |
+| --- | --- | --- |
+| `activity_login.xml` | `LoginActivity` | Form đăng nhập: ô email, mật khẩu, nút Đăng nhập, lối vào Quên mật khẩu |
+| `activity_forgot_password.xml` | `ForgotPasswordActivity` | Form nhập email để yêu cầu đặt lại mật khẩu |
+| `activity_inbox.xml` | `InboxActivity` | Khung chính: `DrawerLayout` gồm Toolbar, vùng chứa Fragment, FAB soạn thư và `NavigationView` |
+| `fragment_mail_list.xml` | `MailListFragment` | Một `RecyclerView` hiển thị danh sách thư của folder đang chọn |
+| `item_email.xml` | `EmailAdapter` | Giao diện **một dòng thư**: avatar, người gửi, tiêu đề, xem trước, ngày (`tvAvatar`, `tvSender`, `tvSubject`, `tvPreview`, `tvDate`) |
+| `activity_mail_detail.xml` | `MailDetailActivity` | Hiển thị nội dung một thư và các nút Xóa, Spam |
+| `activity_compose.xml` | `ComposeActivity` | Toolbar, các ô `etTo`, `etSubject`, `etBody` và nút Gửi |
+
+### `drawable/`: hình nền và biểu tượng
+
+| File | Vai trò |
+| --- | --- |
+| `bg_avatar.xml` | Nền của avatar tròn trong mỗi dòng thư |
+| `bg_field.xml` | Nền (viền, bo góc) dùng chung cho các ô nhập liệu |
+| `button.xml` | Nền và kiểu dáng dùng chung cho các nút |
+| `ic_launcher_background.xml` | Lớp nền của biểu tượng app |
+| `ic_launcher_foreground.xml` | Lớp hình của biểu tượng app |
+
+### Nguyên tắc tổ chức
+
+- Mỗi màn hình có **một file layout riêng**; Java chỉ lấy view qua `id` bằng `findViewById`, nên đổi `id` trong XML thì phải sửa code tương ứng.
+- `item_email.xml` được `EmailAdapter` dùng lại cho **mọi folder**, chỉ khác dữ liệu đổ vào.
+- Các `drawable` dùng chung giúp giao diện nhất quán, đổi một nơi là đổi toàn app.
 ## Luồng đăng nhập (`LoginActivity`)
 
 ```text
