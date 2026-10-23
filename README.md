@@ -101,6 +101,20 @@ Nó quyết định:
 - **Nhớ folder hiện tại:** `setFolder()` được gọi từ `MailListFragment` trước khi gắn Adapter, vì biến này quyết định nhánh ở trên. Quên gọi thì mặc định là Inbox và bấm vào nháp sẽ mở nhầm màn chi tiết.
 - **Phụ thuộc:** model `Email`, layout `item_email.xml`, và `EmailRepository.key(Email)` để tạo `draftKey`.
 
+  ## Callback `onSuccess` / `onError`
+
+Các thao tác gọi mạng (đăng nhập, tải danh sách thư, gửi thư) chạy **bất đồng bộ**. Kết quả được báo về qua một callback có hai phương thức: `onSuccess` và `onError`. Callback này đóng vai trò như một "hợp đồng hai chiều" giữa bên gọi API và bên cung cấp API:
+
+| Bên | Cam kết |
+| --- | --- |
+| **Bên gọi** (Activity / Fragment) | Giao việc và cung cấp hai "cửa" để nhận kết quả |
+| **Bên cung cấp** (`EmailRepository` / `ApiClient`) | Thành công thì gọi `onSuccess`, lỗi thì gọi `onError` |
+
+**Lợi ích:**
+
+- Giao diện không bị đóng băng trong lúc chờ mạng.
+- Mọi kết quả, cả thành công lẫn thất bại, đều có chỗ xử lý.
+
 ## Khi mở INBOX(hộp thư đến)
 
 1. `InboxActivity` → `MailListFragment.newInstance("INBOX")`
