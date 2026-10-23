@@ -172,6 +172,17 @@ Ba hàm nhỏ dưới đây là thành phần quan trọng giữa các phần c�
 | `key(Email)` | Tạo định danh cho một thư (ghép `sender`, `subject`, `date`), dùng nhất quán xuyên các màn hình | `draftKey` khi mở lại nháp, tập `hidden`, so sánh thư khi `remove` |
 | `canon(...)` | Chuẩn hóa đầu vào không đồng nhất thành một khóa thống nhất | Tra cứu `local` theo tên folder |
 | `now()` | Tự sinh ngày gửi, vì dữ liệu từ server giả không có trường này | Thư mới gửi và bản nháp mới lưu |
+
+## Kết quả `true` / `false` khi đăng nhập
+
+`LoginActivity` nhận một giá trị `Boolean` trong `onSuccess` và rẽ nhánh hành vi theo giá trị đó:
+
+| Kết quả | Ý nghĩa | Hành vi của app |
+| --- | --- | --- |
+| `true` | Email tồn tại | Chuyển sang `InboxActivity`, lưu phiên đăng nhập |
+| `false` | Email không tồn tại | Hiện Toast "Sai tài khoản", ở lại `LoginActivity` |
+
+- `true` / `false` chỉ cho biết **email có tồn tại hay không**. Trường hợp gọi mạng thất bại (mất mạng, lỗi server) được báo riêng qua `onError`, không đi qua nhánh này.
   
 ## Sơ đồ luồng hoạt động
 
