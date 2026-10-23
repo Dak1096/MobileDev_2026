@@ -166,6 +166,38 @@ EmailAdapter hiển thị danh sách
 | Chèn thư local | `addAll(0, ...)` đặt thư của người dùng ở **đầu** danh sách, phía dưới là thư từ server |
 | Trả kết quả | `cb.onSuccess(...)` báo danh sách về cho Fragment, `EmailAdapter` hiển thị |
 
+## Luồng hiển thị danh sách thư (`MailListFragment`)
+
+```text
+InboxActivity tạo MailListFragment.newInstance("INBOX")
+│
+├─ onCreateView: inflate layout + đọc folder từ Arguments
+│
+└─ onResume ► loadMails()
+     └─ EmailRepository.fetchFolder("INBOX")     bất đồng bộ
+          ├─ onSuccess(emails)
+          │    ├─ isAdded()?                      chống crash khi Fragment đã bị gỡ
+          │    ├─ new EmailAdapter(emails)
+          │    ├─ adapter.setFolder("INBOX")      ngữ cảnh cho thao tác bấm
+          │    └─ rvMails.setAdapter(adapter)
+          └─ onError(e)
+               └─ isAdded()? ► Toast báo lỗi
+
+Người dùng bấm một thư ► MailDetailActivity ► xóa ► finish()
+│
+└─ Quay lại InboxActivity ► onResume() ► loadMails() chạy lại
+     └─ Danh sách cập nhật, thư đã xóa biến mất
+```
+
+### Các điểm chính
+
+| Điểm | Giải thích |
+| --- | --- |
+| Tải ở `onResume()` | Mỗi lần quay về màn hình, danh sách tự làm mới, không cần thao tác thêm |
+| `isAdded()` | Kết quả mạng có thể về sau khi Fragment đã bị gỡ; kiểm tra trước khi chạm vào giao diện để tránh crash |
+| `setFolder()` | Phải gọi trước khi gắn Adapter, vì nó quyết định bấm thư sẽ mở `ComposeActivity` hay `MailDetailActivity` |
+| Thư đã xóa biến mất | `fetchFolder` lọc các thư có key nằm trong `hidden`, nên thư vừa xóa hoặc chuyển đi không hiện lại |
+
 ## Intent là gì?
 
 **Intent** là cách để các thành phần trong Android giao tiếp với nhau và yêu cầu một hành động, ví dụ mở một màn hình mới kèm dữ liệu.
