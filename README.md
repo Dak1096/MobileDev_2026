@@ -49,6 +49,21 @@ app/src/main/
 - **Trong khung:** `MailListFragment` : danh sách thư, được thay theo folder đang chọn
 - **Mở thành màn hình riêng (qua Intent):** `ComposeActivity` (soạn thư, mở lại nháp) và `MailDetailActivity` (xem chi tiết thư), được gọi từ FAB hoặc khi bấm một thư trong danh sách
 
+## Khởi tạo Activity: `onCreate`
+
+Bốn dòng đầu của `onCreate` có mặt ở mọi màn hình. Chúng chuẩn bị Activity trước khi chạy logic riêng của từng màn.
+
+| Thành phần | Vai trò | Lưu ý |
+| --- | --- | --- |
+| `Bundle savedInstanceState` | Chứa trạng thái cũ của Activity | `null` ở lần mở đầu tiên; có dữ liệu khi Android tạo lại Activity (ví dụ xoay màn hình) |
+| `super.onCreate(...)` | Khôi phục trạng thái nội bộ của Activity | Bắt buộc, đặt ở dòng đầu tiên |
+| `setContentView(...)` | Gắn layout XML vào màn hình | Phải gọi trước `findViewById` |
+| `findViewById(...)` | Lấy `View` theo `id` để điều khiển bằng code | Chỉ dùng được sau `setContentView`, nếu không kết quả là `null` |
+
+**Thứ tự bắt buộc:** khôi phục trạng thái, gắn giao diện, rồi mới lấy view để dùng.
+
+Trong project, `savedInstanceState == null` được dùng ở `InboxActivity` để chỉ nạp folder INBOX ở lần mở đầu tiên, tránh nạp lại mỗi lần xoay màn hình.
+
 ## Luồng tải danh sách thư (`fetchFolder`)
 
 Ví dụ khi người dùng chọn folder **Drafts**:
