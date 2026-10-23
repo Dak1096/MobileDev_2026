@@ -162,6 +162,16 @@ Mọi thao tác đều bắt đầu bằng việc **tìm folder theo khóa**:
 
 - `hidden` là tập khóa các thư đã xóa hoặc chuyển đi. Server giả vẫn trả thư đó về, nên `fetchFolder` phải lọc chúng ra.
 - Mỗi folder chỉ có vài chục thư nên O(n) không ảnh hưởng hiệu năng thực tế.
+
+## Các hàm tiện ích trong `EmailRepository`
+
+Ba hàm nhỏ dưới đây là thành phần quan trọng giữa các phần của app: chúng không xử lý nghiệp vụ lớn nhưng giữ cho dữ liệu nhất quán khi đi qua nhiều màn hình và nhiều lớp.
+
+| Hàm | Vai trò | Dùng ở đâu |
+| --- | --- | --- |
+| `key(Email)` | Tạo định danh cho một thư (ghép `sender`, `subject`, `date`), dùng nhất quán xuyên các màn hình | `draftKey` khi mở lại nháp, tập `hidden`, so sánh thư khi `remove` |
+| `canon(...)` | Chuẩn hóa đầu vào không đồng nhất thành một khóa thống nhất | Tra cứu `local` theo tên folder |
+| `now()` | Tự sinh ngày gửi, vì dữ liệu từ server giả không có trường này | Thư mới gửi và bản nháp mới lưu |
   
 ## Sơ đồ luồng hoạt động
 
