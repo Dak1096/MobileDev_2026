@@ -91,6 +91,45 @@ Bốn dòng đầu của `onCreate` có mặt ở mọi màn hình. Chúng chu�
 
 Trong project, `savedInstanceState == null` được dùng ở `InboxActivity` để chỉ nạp folder INBOX ở lần mở đầu tiên, tránh nạp lại mỗi lần xoay màn hình.
 
+## Luồng xem chi tiết thư (`MailDetailActivity`)
+
+```text
+EmailAdapter: bấm một thư (folder khác Drafts)
+│
+└─ MailDetailActivity nhận extras
+     ├─ s() chống null
+     ├─ Hiển thị 4 TextView (sender, subject, date, body)
+     ├─ Tạo đối tượng Email
+     ├─ Xác định inTrash / inSpam ► đổi label nút
+     │
+     ├─ Bấm Xóa
+     │    ├─ inTrash ► deleteForever()          xóa vĩnh viễn
+     │    └─ ngược lại ► moveEmail("TRASH")     chuyển vào Trash
+     │
+     └─ Bấm Spam
+          ├─ inSpam ► moveEmail("INBOX")        "Không phải spam"
+          └─ ngược lại ► moveEmail("SPAM")      chuyển vào Spam
+
+Sau mỗi thao tác: finish() ► quay lại InboxActivity ► danh sách được tải lại (fetchFolder)
+```
+
+### Hành vi theo ngữ cảnh
+
+Cùng một nút nhưng hành vi phụ thuộc folder hiện tại:
+
+| Nút | Điều kiện | Hàm gọi | Loại thao tác |
+| --- | --- | --- | --- |
+| Xóa | Đang ở Trash | `deleteForever` | Delete |
+| Xóa | Folder khác | `moveEmail` sang `TRASH` | Chuyển folder (Update) |
+| Spam | Đang ở Spam | `moveEmail` sang `INBOX` | Chuyển folder (Update) |
+| Spam | Folder khác | `moveEmail` sang `SPAM` | Chuyển folder (Update) |
+
+### Các điểm chính
+
+- `s()` trả về chuỗi rỗng khi extra là `null`, nên màn hình không bị crash khi thiếu dữ liệu.
+- Extra `folder` không hiển thị lên màn hình, nó chỉ dùng để xác định `inTrash` / `inSpam` và đổi nhãn nút (Xóa thành "Xóa vĩnh viễn", Spam thành "Không phải spam").
+- Màn hình này không tự lưu gì, nó chỉ gọi `EmailRepository` để thực hiện thao tác. Danh sách ở màn trước được làm mới nhờ `MailListFragment` tải lại ở `onResume()`.
+
 ## Luồng tải danh sách thư (`fetchFolder`)
 
 Ví dụ khi người dùng chọn folder **Drafts**:
