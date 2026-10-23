@@ -51,7 +51,7 @@ app/src/main/
 
 ## Intent là gì?
 
-**Intent** là cách để các thành phần trong Android giao tiếp với nhau và yêu cầu một hành động.
+**Intent** là cách để các thành phần trong Android giao tiếp với nhau và yêu cầu một hành động
 
 ### Intent trong project này
 
