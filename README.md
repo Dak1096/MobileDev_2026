@@ -50,6 +50,10 @@ app/src/main/
 - **Mở thành màn hình riêng (qua Intent):** `ComposeActivity` (soạn thư, mở lại nháp) và `MailDetailActivity` (xem chi tiết thư), được gọi từ FAB hoặc khi bấm một thư trong danh sách
 
 ## Intent là gì?
+
+**Intent** là cách để các thành phần trong Android giao tiếp với nhau và yêu cầu một hành động, ví dụ mở một màn hình mới kèm dữ liệu.
+
+### Vấn đề cần giải quyết
 Khi người dùng bấm vào một thư trong danh sách, ứng dụng cần:
 
 1. Mở sang màn hình chi tiết thư (`MailDetailActivity`).
