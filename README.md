@@ -49,10 +49,17 @@ app/src/main/
 - **Trong khung:** `MailListFragment` : danh sách thư, được thay theo folder đang chọn
 - **Mở thành màn hình riêng (qua Intent):** `ComposeActivity` (soạn thư, mở lại nháp) và `MailDetailActivity` (xem chi tiết thư), được gọi từ FAB hoặc khi bấm một thư trong danh sách
 
-Intent là gì?
+## Intent là gì?
 
-**Intent** là cách để các thành phần trong Android giao tiếp với nhau và yêu cầu một hành động
- Trong project: `EmailAdapter` và `InboxActivity` dùng Intent để mở `MailDetailActivity` / `ComposeActivity` và truyền `sender`, `subject`, `date`, `body`, `folder`, `draftKey` qua extras
+**Intent** là cách để các thành phần trong Android giao tiếp với nhau và yêu cầu một hành động.
+
+### Intent trong project này
+
+`EmailAdapter` và `InboxActivity` dùng Intent để mở màn hình mới và truyền dữ liệu qua extras:
+
+| Mở màn hình | Từ | Extras truyền đi |
+| --- | --- | --- |
+| `MailDetailActivity` | `EmailAdapter` (bấm một thư) | `sender`, `subject`, `date`,
 
 ## Khi mở INBOX
 
