@@ -61,7 +61,39 @@ app/src/main/
 | --- | --- | --- |
 | `MailDetailActivity` | `EmailAdapter` (bấm một thư) | `sender`, `subject`, `date`,
 
-## Khi mở INBOX
+## Adapter là gì?
+
+Trong Android, **Adapter** đóng vai trò cầu nối giữa:
+
+- **Dữ liệu**: danh sách `List<Email>`
+- **Giao diện**: `RecyclerView`
+
+Nó quyết định:
+
+- Có bao nhiêu item cần hiển thị
+- Mỗi item trông như thế nào (layout)
+- Dữ liệu nào được gán vào từng item
+
+### Ba hàm chính của Adapter
+
+| Hàm | Việc làm |
+| --- | --- |
+| `onCreateViewHolder` | Nạp (inflate) layout cho một dòng, ở đây là `item_email.xml` |
+| `onBindViewHolder` | Gán dữ liệu của một `Email` vào dòng đó và gắn sự kiện bấm |
+| `getItemCount` | Trả về số item cần hiển thị |
+
+`RecyclerView` chỉ tạo số dòng vừa đủ cho màn hình rồi **tái sử dụng** khi cuộn, nên danh sách dài vẫn mượt.
+
+### `EmailAdapter` trong project này
+
+- **Hiển thị:** gán 5 trường vào 5 `TextView`: người gửi, tiêu đề, xem trước, ngày và avatar. Avatar là chữ cái đầu của người gửi (rỗng thì hiện `?`).
+- **Xử lý bấm vào một thư:** rẽ nhánh theo folder hiện tại:
+  - Folder Drafts: mở `ComposeActivity` kèm `draftKey`, `to`, `subject`, `body` để sửa nháp.
+  - Folder khác: mở `MailDetailActivity` kèm `sender`, `subject`, `date`, `body`, `folder`.
+- **Nhớ folder hiện tại:** `setFolder()` được gọi từ `MailListFragment` trước khi gắn Adapter, vì biến này quyết định nhánh ở trên. Quên gọi thì mặc định là Inbox và bấm vào nháp sẽ mở nhầm màn chi tiết.
+- **Phụ thuộc:** model `Email`, layout `item_email.xml`, và `EmailRepository.key(Email)` để tạo `draftKey`.
+
+## Khi mở INBOX(hộp thư đến)
 
 1. `InboxActivity` → `MailListFragment.newInstance("INBOX")`
 2. Fragment `onResume()` → `EmailRepository.fetchFolder("INBOX", callback)`
