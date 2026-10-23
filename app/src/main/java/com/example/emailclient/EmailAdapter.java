@@ -8,7 +8,6 @@ import android.content.Intent;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.List;
 
 public class EmailAdapter extends RecyclerView.Adapter<EmailAdapter.VH> {
@@ -21,6 +20,7 @@ public class EmailAdapter extends RecyclerView.Adapter<EmailAdapter.VH> {
     private final List<Email> list;
 
     public EmailAdapter(List<Email> list) {
+
         this.list = list;
     }
 
