@@ -40,6 +40,33 @@ app/src/main/
     ├── layout/                      # activity_*.xml, fragment_mail_list.xml, item_email.xml
     └── values/                      # strings.xml, colors.xml, themes.xml
 ```
+## Luồng đăng nhập (`LoginActivity`)
+
+```text
+Bấm "Đăng nhập"
+│
+├─ Lấy email + password
+│    ├─ email rỗng ────► Toast, dừng (return)
+│    └─ password rỗng ─► Toast, dừng (return)
+│
+├─ btnLogin.setEnabled(false)         khóa nút, chống bấm nhiều lần
+│
+└─ EmailRepository.login(email)       gọi API bất đồng bộ
+     ├─ onSuccess(ok = true) ───► mở InboxActivity + finish()
+     ├─ onSuccess(ok = false) ──► Toast "Sai tài khoản"
+     └─ onError(e) ─────────────► Toast "Lỗi tải"
+
+Cả 3 nhánh kết quả: btnLogin.setEnabled(true)   mở khóa nút
+```
+
+| Kết quả | Ý nghĩa | Hành vi của app |
+| --- | --- | --- |
+| `onSuccess(ok = true)` | Email tồn tại | Mở `InboxActivity`, đóng `LoginActivity` bằng `finish()` |
+| `onSuccess(ok = false)` | Email không tồn tại | Hiện Toast "Sai tài khoản", ở lại màn đăng nhập |
+| `onError(e)` | Gọi mạng thất bại | Hiện Toast "Lỗi tải", ở lại màn đăng nhập để thử lại |
+
+- Nút đăng nhập bị khóa trong lúc chờ API để tránh gửi nhiều yêu cầu cùng lúc, và được mở lại ở cả ba nhánh để người dùng có thể thử lại.
+- Theo luồng trên, `login(email)` chỉ nhận email, còn mật khẩu chỉ được kiểm tra **không rỗng**. Server giả không kiểm tra mật khẩu.
 ## Phân tầng
 
 - **`ApiClient`** là cơ chế GET/POST chung, ở tầng **transport** (làm sao gửi)
