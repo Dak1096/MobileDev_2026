@@ -141,6 +141,66 @@ Nó quyết định:
 - **Nhớ folder hiện tại:** `setFolder()` được gọi từ `MailListFragment` trước khi gắn Adapter, vì biến này quyết định nhánh ở trên. Quên gọi thì mặc định là Inbox và bấm vào nháp sẽ mở nhầm màn chi tiết.
 - **Phụ thuộc:** model `Email`, layout `item_email.xml`, và `EmailRepository.key(Email)` để tạo `draftKey`.
 
+## CRUD in-memory qua Adapter
+
+Dữ liệu thư được quản lý trong `EmailRepository`. `EmailAdapter` chỉ **đọc** danh sách đó để hiển thị và điều hướng tới màn hình thực hiện các thao tác thay đổi dữ liệu.
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│ EmailRepository (in-memory "DB")                            │
+│   local:  Map<folder, List<Email>>   dữ liệu chính          │
+│   hidden: Set<key>                   thư đã xóa/chuyển đi   │
+│                                                             │
+│   Create: sendEmail(), saveDraft()                          │
+│   Read:   fetchFolder() = (server − hidden) + local         │
+│   Update: saveDraft() (xóa cũ, thêm mới)                    │
+│   Move:   moveEmail() chuyển thư sang folder khác           │
+│   Delete: deleteForever(), discardDraft()                   │
+└──────────────────────────────┬──────────────────────────────┘
+                               │ trả List<Email> đã chuẩn bị
+                               ▼
+┌─────────────────────────────────────────────────────────────┐
+│ EmailAdapter (chỉ Read)                                     │
+│   list   ──► onBindViewHolder ──► TextView                  │
+│   folder ──► quyết định click mở màn nào                    │
+│                                                             │
+│   Click Drafts ──► ComposeActivity     (sửa nháp)           │
+│   Click khác   ──► MailDetailActivity  (xem chi tiết)       │
+└──────────────────────────────┬──────────────────────────────┘
+                               │
+                               ▼
+          ComposeActivity / MailDetailActivity
+          gọi EmailRepository để Create / Update / Move / Delete
+```
+
+### Thành phần của `EmailAdapter`
+
+| Thành phần | Vai trò | Ghi chú |
+| --- | --- | --- |
+| `list` (constructor) | Nguồn dữ liệu hiển thị | Tham chiếu tới danh sách `Email` mà Repository đã chuẩn bị |
+| `folder` / `setFolder()` | Ngữ cảnh của danh sách | Quyết định một lần bấm sẽ mở màn nào |
+| `ViewHolder` | Tối ưu hiển thị | Lưu sẵn các view, tránh gọi `findViewById` lặp lại |
+| `onCreateViewHolder` | Tạo khung cho một dòng | Inflate `item_email.xml` mỗi khi cần ViewHolder mới |
+| `onBindViewHolder` | Hiển thị chính | Gán dữ liệu, tạo avatar, gắn sự kiện bấm |
+| `getItemCount` | Số dòng cần hiển thị | Trả về `list.size()` |
+| Click handler | Điều hướng | Drafts mở `ComposeActivity`, folder khác mở `MailDetailActivity` |
+
+### Ai thực hiện thao tác nào
+
+| Thao tác | Kích hoạt từ | Hàm trong Repository |
+| --- | --- | --- |
+| Create | `ComposeActivity` (bấm Gửi) | `sendEmail` |
+| Create / Update | `ComposeActivity` (thoát khi chưa gửi) | `saveDraft` |
+| Read | `MailListFragment` + `EmailAdapter` | `fetchFolder` |
+| Move | `MailDetailActivity` (Xóa, Spam) | `moveEmail` |
+| Delete | `MailDetailActivity` (trong Trash), `ComposeActivity` (bỏ nháp) | `deleteForever`, `discardDraft` |
+
+### Điểm cần lưu ý
+
+- `EmailAdapter` **chỉ đọc** danh sách và vẽ lên màn hình, không tạo, sửa hay xóa dữ liệu.
+- `folder` là "ngữ cảnh" biến cùng một lần bấm thành hai hành động khác nhau: bấm nháp thì mở `ComposeActivity` để sửa, bấm thư thường thì mở `MailDetailActivity` để xem.
+- Vì vậy `setFolder()` phải được gọi **trước khi** gắn Adapter vào `RecyclerView`. Nếu quên, Adapter mặc định là Inbox và bấm vào nháp sẽ mở nhầm màn chi tiết.
+
 ### Callback `onSuccess` / `onError`
 
 Các thao tác gọi mạng (đăng nhập, tải danh sách thư, gửi thư) chạy **bất đồng bộ**. Kết quả được báo về qua một callback có hai phương thức: `onSuccess` và `onError`. Callback này đóng vai trò như một "hợp đồng hai chiều" giữa bên gọi API và bên cung cấp API:
