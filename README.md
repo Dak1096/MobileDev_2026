@@ -90,13 +90,18 @@ Sau mỗi thao tác: finish() → quay lại màn trước
 
 ```mermaid
 flowchart TD
-    L["LoginActivity<br/>(MAIN + LAUNCHER)"] -->|Đăng nhập OK| I[InboxActivity]
-    L -->|Quên mật khẩu| F[ForgotPasswordActivity]
-    F -->|Xong| L
-    I -->|Bấm một thư| D[MailDetailActivity]
-    I -->|FAB hoặc bấm một nháp| C[ComposeActivity]
-    D -->|finish| I
-    C -->|finish| I
+    L["LoginActivity - MAIN và LAUNCHER"]
+    F["ForgotPasswordActivity"]
+    I["InboxActivity"]
+    D["MailDetailActivity"]
+    C["ComposeActivity"]
+    L -->|"Đăng nhập OK"| I
+    L -->|"Quên mật khẩu"| F
+    F -->|"Xong"| L
+    I -->|"Bấm một thư"| D
+    I -->|"FAB hoặc bấm một nháp"| C
+    D -->|"finish"| I
+    C -->|"finish"| I
 ```
 
 **Entry point duy nhất:** `LoginActivity` (intent-filter `MAIN` + `LAUNCHER`).
@@ -105,11 +110,11 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A[Nhập email] --> B{Bấm nút nào?}
-    B -->|Đăng nhập| C[Gọi API kiểm tra tài khoản]
-    C -->|Hợp lệ| D["startActivity(InboxActivity) + finish()"]
-    C -->|Không hợp lệ hoặc lỗi mạng| E[Toast báo lỗi]
-    B -->|Quên mật khẩu| F[Mở ForgotPasswordActivity]
+    A["Nhập email"] --> B{"Bấm nút nào?"}
+    B -->|"Đăng nhập"| C["Gọi API kiểm tra tài khoản"]
+    C -->|"Hợp lệ"| D["startActivity InboxActivity rồi finish"]
+    C -->|"Không hợp lệ hoặc lỗi mạng"| E["Toast báo lỗi"]
+    B -->|"Quên mật khẩu"| F["Mở ForgotPasswordActivity"]
 ```
 
 - `windowSoftInputMode="adjustResize"`: bàn phím không che ô nhập.
@@ -119,20 +124,22 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    A[Nhập email] --> B[Gửi yêu cầu reset] --> C[Toast kết quả] --> D[finish → quay lại Login]
+    A["Nhập email"] --> B["Gửi yêu cầu reset"]
+    B --> C["Toast kết quả"]
+    C --> D["finish, quay lại Login"]
 ```
 
 ### 4. InboxActivity: hộp thư đến
 
 ```mermaid
 flowchart TD
-    A[onCreate: dựng Toolbar + Drawer + FAB] --> B[Mặc định nạp INBOX]
-    B --> C[MailListFragment hiển thị danh sách]
-    C -->|Chọn folder ở Drawer| D[Thay MailListFragment theo folder]
+    A["onCreate - dựng Toolbar, Drawer, FAB"] --> B["Mặc định nạp INBOX"]
+    B --> C["MailListFragment hiển thị danh sách"]
+    C -->|"Chọn folder ở Drawer"| D["Thay MailListFragment theo folder"]
     D --> C
-    C -->|Bấm thư ở Drafts| E[ComposeActivity, kèm draftKey]
-    C -->|Bấm thư ở folder khác| F[MailDetailActivity]
-    A -->|Bấm FAB| G[ComposeActivity, form trống]
+    C -->|"Bấm thư ở Drafts"| E["ComposeActivity, kèm draftKey"]
+    C -->|"Bấm thư ở folder khác"| F["MailDetailActivity"]
+    A -->|"Bấm FAB"| G["ComposeActivity, form trống"]
 ```
 
 Intent extras khi mở `MailDetailActivity`:
@@ -149,18 +156,18 @@ Intent extras khi mở `MailDetailActivity`:
 
 ```mermaid
 flowchart TD
-    A[Mở MailDetailActivity] --> B[Đọc Intent extras]
-    B --> C[Hiển thị lên TextView]
-    C --> D[Xác định ngữ cảnh: inTrash / inSpam]
-    D --> E[Đổi label nút theo ngữ cảnh]
-    E --> F{Bấm nút nào?}
-    F -->|Xóa| G{Đang ở Trash?}
-    G -->|Có| H[deleteForever]
-    G -->|Không| I["moveEmail → TRASH"]
-    F -->|Spam| J{Đang ở Spam?}
-    J -->|Có| K["moveEmail → INBOX"]
-    J -->|Không| L["moveEmail → SPAM"]
-    H --> M[finish → quay lại màn trước]
+    A["Mở MailDetailActivity"] --> B["Đọc Intent extras"]
+    B --> C["Hiển thị lên TextView"]
+    C --> D["Xác định ngữ cảnh inTrash, inSpam"]
+    D --> E["Đổi label nút theo ngữ cảnh"]
+    E --> F{"Bấm nút nào?"}
+    F -->|"Xóa"| G{"Đang ở Trash?"}
+    G -->|"Có"| H["deleteForever"]
+    G -->|"Không"| I["moveEmail sang TRASH"]
+    F -->|"Spam"| J{"Đang ở Spam?"}
+    J -->|"Có"| K["moveEmail sang INBOX"]
+    J -->|"Không"| L["moveEmail sang SPAM"]
+    H --> M["finish, quay lại màn trước"]
     I --> M
     K --> M
     L --> M
@@ -181,19 +188,22 @@ Hành vi nút theo thư mục:
 
 ```mermaid
 flowchart TD
-    A[onCreate: đọc extras, điền sẵn 3 ô] --> B[Chờ người dùng thao tác]
-    B -->|Bấm Gửi| C{to rỗng?}
-    C -->|Có| D[Toast error_to_required] --> B
-    C -->|Không| E{subject rỗng?}
-    E -->|Có| F[Toast error_subject_required] --> B
-    E -->|Không| G[Tắt nút Gửi + sendEmail]
-    G -->|Thành công| H["Bật lại nút, sent = true, xóa nháp cũ nếu có, Toast sent_ok, finish"]
-    G -->|Thất bại hoặc lỗi| I[Bật lại nút + Toast error_send_failed] --> B
-    B -->|Back / thoát chưa gửi| J["onPause: isFinishing và chưa sent?"]
-    J -->|Không| K[Không lưu nháp]
-    J -->|Có, còn nội dung| L[saveDraft + Toast draft_saved]
-    J -->|Có, hết nội dung, có draftKey| M[discardDraft]
-    J -->|Có, hết nội dung, không draftKey| N[Không làm gì]
+    A["onCreate - đọc extras, điền sẵn 3 ô"] --> B["Chờ người dùng thao tác"]
+    B -->|"Bấm Gửi"| C{"to rỗng?"}
+    C -->|"Có"| D["Toast error_to_required"]
+    D --> B
+    C -->|"Không"| E{"subject rỗng?"}
+    E -->|"Có"| F["Toast error_subject_required"]
+    F --> B
+    E -->|"Không"| G["Tắt nút Gửi và gọi sendEmail"]
+    G -->|"Thành công"| H["Bật lại nút, sent = true, xóa nháp cũ nếu có, Toast sent_ok, finish"]
+    G -->|"Thất bại hoặc lỗi"| I["Bật lại nút, Toast error_send_failed"]
+    I --> B
+    B -->|"Back hoặc thoát chưa gửi"| J{"onPause - isFinishing và chưa sent?"}
+    J -->|"Không"| K["Không lưu nháp"]
+    J -->|"Có, còn nội dung"| L["saveDraft, Toast draft_saved"]
+    J -->|"Có, hết nội dung, có draftKey"| M["discardDraft"]
+    J -->|"Có, hết nội dung, không draftKey"| N["Không làm gì"]
 ```
 
 - `adjustResize`: bàn phím không che ô Body.
@@ -204,10 +214,10 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    UI["Activity / Fragment / Adapter"] --> R[EmailRepository]
-    R --> A[ApiClient]
-    A --> S["Server giả (JSONPlaceholder)"]
-    R --> LC["Dữ liệu local: thư local + hidden"]
+    UI["Activity, Fragment, Adapter"] --> R["EmailRepository"]
+    R --> A["ApiClient"]
+    A --> S["Server giả JSONPlaceholder"]
+    R --> LC["Dữ liệu local - thư local và hidden"]
 ```
 
 ### Bảng tóm tắt
