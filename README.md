@@ -49,6 +49,42 @@ app/src/main/
 - **Trong khung:** `MailListFragment` : danh sách thư, được thay theo folder đang chọn
 - **Mở thành màn hình riêng (qua Intent):** `ComposeActivity` (soạn thư, mở lại nháp) và `MailDetailActivity` (xem chi tiết thư), được gọi từ FAB hoặc khi bấm một thư trong danh sách
 
+## Luồng tải danh sách thư (`fetchFolder`)
+
+Ví dụ khi người dùng chọn folder **Drafts**:
+
+```text
+Chọn folder "Drafts"
+      │
+      ▼
+fetchFolder(ctx, "Drafts", cb)
+      │   path = "/comments?postId=3"
+      ▼
+ApiClient.get (chạy nền)
+      │
+      ▼   (khi server phản hồi)
+onSuccess(body JSON)
+      │   ├─ Parse JSON → danh sách Email
+      │   └─ Lọc bỏ thư có key nằm trong hidden
+      ▼
+result.addAll(0, local["DRAFTS"])   ← chèn nháp của người dùng lên đầu
+      │
+      ▼
+cb.onSuccess([nháp_user, mail1, mail2, ...])
+      │
+      ▼
+EmailAdapter hiển thị danh sách
+```
+
+| Bước | Việc làm |
+| --- | --- |
+| Chọn đường dẫn API | Mỗi folder dùng một `postId` khác nhau để có dữ liệu riêng (Drafts dùng `postId=3`) |
+| Gọi mạng | `ApiClient.get` chạy ở luồng nền nên giao diện không bị đóng băng |
+| Parse JSON | Mỗi comment được ánh xạ thành một `Email` (`name` → tiêu đề, `email` → người gửi, `body` → nội dung, `id` → mã) |
+| Lọc `hidden` | Bỏ các thư người dùng đã xóa hoặc chuyển đi, vì server giả vẫn trả chúng về |
+| Chèn thư local | `addAll(0, ...)` đặt thư của người dùng ở **đầu** danh sách, phía dưới là thư từ server |
+| Trả kết quả | `cb.onSuccess(...)` báo danh sách về cho Fragment, `EmailAdapter` hiển thị |
+
 ## Intent là gì?
 
 **Intent** là cách để các thành phần trong Android giao tiếp với nhau và yêu cầu một hành động, ví dụ mở một màn hình mới kèm dữ liệu.
