@@ -7,6 +7,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.appbar.MaterialToolbar;
 
@@ -16,10 +17,14 @@ public class MailDetailActivity extends AppCompatActivity {
         return v == null ? "" : v;
     }
 
+    private MailDetailViewModel viewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mail_detail);
+
+        viewModel = new ViewModelProvider(this).get(MailDetailViewModel.class);
 
         MaterialToolbar toolbar = findViewById(R.id.toolbarDetail);
         TextView tvSubject = findViewById(R.id.tvDetailSubject);
@@ -43,33 +48,21 @@ public class MailDetailActivity extends AppCompatActivity {
         tvDate.setText(date);
         tvBody.setText(body);
 
-        final Email email = new Email(sender, subject, body, date);
-        final boolean inTrash = folder.contains("Trash");
-        final boolean inSpam = folder.contains("Spam");
+        viewModel.init(new Email(sender, subject, body, date), folder);
 
-        if (inTrash) btnDelete.setText(R.string.delete_forever);
-        if (inSpam) btnSpam.setText(R.string.not_spam);
+        if (viewModel.isInTrash()) btnDelete.setText(R.string.delete_forever);
+        if (viewModel.isInSpam()) btnSpam.setText(R.string.not_spam);
 
-        btnDelete.setOnClickListener(v -> {
-            if (inTrash) {
-                EmailRepository.deleteForever(email);
-                Toast.makeText(this, R.string.deleted_forever, Toast.LENGTH_SHORT).show();
-            } else {
-                EmailRepository.moveEmail(email, "TRASH");
-                Toast.makeText(this, R.string.moved_trash, Toast.LENGTH_SHORT).show();
+        btnDelete.setOnClickListener(v -> viewModel.onDeleteClicked());
+        btnSpam.setOnClickListener(v -> viewModel.onSpamClicked());
+
+        // Thao tác xong: hiện Toast rồi đóng màn hình
+        viewModel.getDoneMessageRes().observe(this, resId -> {
+            if (resId != null) {
+                viewModel.clearDone();
+                Toast.makeText(this, resId, Toast.LENGTH_SHORT).show();
+                finish();
             }
-            finish();
-        });
-
-        btnSpam.setOnClickListener(v -> {
-            if (inSpam) {
-                EmailRepository.moveEmail(email, "INBOX");
-                Toast.makeText(this, R.string.moved_inbox, Toast.LENGTH_SHORT).show();
-            } else {
-                EmailRepository.moveEmail(email, "SPAM");
-                Toast.makeText(this, R.string.moved_spam, Toast.LENGTH_SHORT).show();
-            }
-            finish();
         });
     }
 }

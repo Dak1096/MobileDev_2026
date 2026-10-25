@@ -113,7 +113,7 @@ public class EmailRepository {
 
     public static void fetchFolder(Context ctx, String folder,
                                    ApiClient.Callback<List<Email>> cb) {
-        String path = "/comments?_limit=30";
+        String path = "/comments?_limit=30"; //Mock API
         if (folder.contains("Sent"))        path = "/comments?postId=2";
         else if (folder.contains("Drafts")) path = "/comments?postId=3";
         else if (folder.contains("Spam"))   path = "/comments?postId=4";
