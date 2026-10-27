@@ -13,10 +13,6 @@ import com.google.android.material.appbar.MaterialToolbar;
 
 public class MailDetailActivity extends AppCompatActivity {
 
-    private static String s(String v) {
-        return v == null ? "" : v;
-    }
-
     private MailDetailViewModel viewModel;
 
     @Override
@@ -26,37 +22,49 @@ public class MailDetailActivity extends AppCompatActivity {
 
         viewModel = new ViewModelProvider(this).get(MailDetailViewModel.class);
 
+        String id = getIntent().getStringExtra("id");
+        String folder = getIntent().getStringExtra("folder");
+        if (folder == null) folder = "";
+
+        MailStore store = MailStore.get(this);
+        Email email = id == null ? null : store.findById(id);
+        if (email == null) {
+            finish();
+            return;
+        }
+
         MaterialToolbar toolbar = findViewById(R.id.toolbarDetail);
         TextView tvSubject = findViewById(R.id.tvDetailSubject);
         TextView tvSender = findViewById(R.id.tvDetailSender);
         TextView tvDate = findViewById(R.id.tvDetailDate);
         TextView tvBody = findViewById(R.id.tvDetailBody);
+        TextView btnStar = findViewById(R.id.btnStar);
+        Button btnReply = findViewById(R.id.btnReply);
+        Button btnForward = findViewById(R.id.btnForward);
         Button btnSpam = findViewById(R.id.btnSpam);
         Button btnDelete = findViewById(R.id.btnDelete);
 
         toolbar.setNavigationOnClickListener(v -> finish());
 
-        Intent intent = getIntent();
-        String sender = s(intent.getStringExtra("sender"));
-        String subject = s(intent.getStringExtra("subject"));
-        String date = s(intent.getStringExtra("date"));
-        String body = s(intent.getStringExtra("body"));
-        String folder = s(intent.getStringExtra("folder"));
+        tvSubject.setText(email.getSubject());
+        tvSender.setText(getString(R.string.detail_from) + ": " + email.getSender());
+        tvDate.setText(email.getDate());
+        tvBody.setText(email.getBody());
 
-        tvSubject.setText(subject);
-        tvSender.setText(getString(R.string.detail_from) + ": " + sender);
-        tvDate.setText(date);
-        tvBody.setText(body);
-
-        viewModel.init(new Email(sender, subject, body, date), folder);
+        viewModel.init(store, email, folder);
 
         if (viewModel.isInTrash()) btnDelete.setText(R.string.delete_forever);
         if (viewModel.isInSpam()) btnSpam.setText(R.string.not_spam);
 
         btnDelete.setOnClickListener(v -> viewModel.onDeleteClicked());
         btnSpam.setOnClickListener(v -> viewModel.onSpamClicked());
+        btnStar.setOnClickListener(v -> viewModel.toggleStar());
+        btnReply.setOnClickListener(v -> compose("Re: " + email.getSubject(), email.getSender(), email.getBody()));
+        btnForward.setOnClickListener(v -> compose("Fwd: " + email.getSubject(), "", email.getBody()));
 
-        // Thao tác xong: hiện Toast rồi đóng màn hình
+        viewModel.getStarred().observe(this, s ->
+                btnStar.setText(Boolean.TRUE.equals(s) ? "\u2605" : "\u2606"));
+
         viewModel.getDoneMessageRes().observe(this, resId -> {
             if (resId != null) {
                 viewModel.clearDone();
@@ -64,5 +72,13 @@ public class MailDetailActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    private void compose(String subject, String to, String quotedBody) {
+        Intent intent = new Intent(this, ComposeActivity.class);
+        intent.putExtra("to", to);
+        intent.putExtra("subject", subject);
+        intent.putExtra("body", "\n\n----------\n" + quotedBody);
+        startActivity(intent);
     }
 }

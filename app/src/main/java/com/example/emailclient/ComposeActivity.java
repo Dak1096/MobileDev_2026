@@ -13,7 +13,9 @@ import com.google.android.material.appbar.MaterialToolbar;
 
 public class ComposeActivity extends AppCompatActivity {
 
-    private EditText etTo, etSubject, etBody;
+    private EditText etTo;
+    private EditText etSubject;
+    private EditText etBody;
     private ComposeViewModel viewModel;
 
     @Override
@@ -31,23 +33,31 @@ public class ComposeActivity extends AppCompatActivity {
 
         toolbar.setNavigationOnClickListener(v -> finish());
 
-        // Nếu mở từ mục Drafts thì điền sẵn dữ liệu
         Intent in = getIntent();
-        viewModel.init(in.getStringExtra("draftKey"));
-        etTo.setText(in.getStringExtra("to"));
-        etSubject.setText(in.getStringExtra("subject"));
-        etBody.setText(in.getStringExtra("body"));
+        String draftId = in.getStringExtra("draftId");
+        viewModel.init(draftId);
+
+        if (draftId != null) {
+            Email draft = MailStore.get(this).findById(draftId);
+            if (draft != null) {
+                etTo.setText(draft.getSender());
+                etSubject.setText(draft.getSubject());
+                etBody.setText(draft.getBody());
+            }
+        } else {
+            etTo.setText(in.getStringExtra("to"));
+            etSubject.setText(in.getStringExtra("subject"));
+            etBody.setText(in.getStringExtra("body"));
+        }
 
         btnSend.setOnClickListener(v -> viewModel.send(
                 etTo.getText().toString().trim(),
                 etSubject.getText().toString().trim(),
                 etBody.getText().toString()));
 
-        // Khóa/mở nút Gửi theo trạng thái đang gửi
         viewModel.getLoading().observe(this, loading ->
                 btnSend.setEnabled(!Boolean.TRUE.equals(loading)));
 
-        // Toast lỗi (hiện một lần)
         viewModel.getMessageRes().observe(this, resId -> {
             if (resId != null) {
                 viewModel.clearMessage();
@@ -55,7 +65,6 @@ public class ComposeActivity extends AppCompatActivity {
             }
         });
 
-        // Gửi thành công: Toast rồi đóng màn hình
         viewModel.getSentMessageRes().observe(this, resId -> {
             if (resId != null) {
                 viewModel.clearSentMessage();
@@ -68,7 +77,6 @@ public class ComposeActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        // Thoát màn hình mà chưa gửi: ViewModel quyết định lưu nháp hay bỏ
         if (isFinishing()) {
             boolean saved = viewModel.onExit(
                     etTo.getText().toString().trim(),

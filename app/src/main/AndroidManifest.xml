@@ -33,6 +33,10 @@
             android:name=".MailDetailActivity"
             android:exported="false" />
         <activity
+            android:name=".RegisterActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".ForgotPasswordActivity"
             android:exported="false" />
     </application>

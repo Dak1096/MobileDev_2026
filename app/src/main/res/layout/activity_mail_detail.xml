@@ -38,6 +38,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <TextView
@@ -48,6 +49,16 @@
                     android:textSize="15sp"
                     android:textStyle="bold"
                     android:textColor="#1F1F1F" />
+
+                <TextView
+                    android:id="@+id/btnStar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="&#9734;"
+                    android:textColor="#F4B400"
+                    android:textSize="22sp" />
 
                 <TextView
                     android:id="@+id/tvDetailDate"
@@ -79,6 +90,28 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="8dp">
+
+        <Button
+            android:id="@+id/btnReply"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:text="@string/reply"
+            android:textColor="#001D35"
+            app:strokeColor="#C2E7FF" />
+
+        <Button
+            android:id="@+id/btnForward"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:text="@string/forward"
+            android:textColor="#001D35"
+            app:strokeColor="#C2E7FF" />
 
         <Button
             android:id="@+id/btnSpam"

@@ -14,11 +14,16 @@
     <string name="error_load_failed">Couldn\'t load emails. Check your connection.</string>
 
     <string name="menu_inbox">Inbox</string>
+    <string name="menu_starred">Starred</string>
     <string name="menu_sent">Sent</string>
     <string name="menu_drafts">Drafts</string>
     <string name="menu_spam">Spam</string>
     <string name="menu_trash">Trash</string>
     <string name="compose_email">Compose email</string>
+    <string name="logout">Sign out</string>
+    <string name="search_hint">Search mail</string>
+    <string name="refresh">Refresh</string>
+    <string name="empty_mail">No messages here</string>
 
     <string name="compose_title">Compose</string>
     <string name="hint_to">To</string>
@@ -31,6 +36,8 @@
     <string name="error_send_failed">Couldn\'t send email</string>
     <string name="detail_title">Message</string>
     <string name="detail_from">From</string>
+    <string name="reply">Reply</string>
+    <string name="forward">Forward</string>
 
     <string name="delete">Delete</string>
     <string name="delete_forever">Delete forever</string>
@@ -41,6 +48,14 @@
     <string name="moved_inbox">Moved to Inbox</string>
     <string name="deleted_forever">Deleted forever</string>
     <string name="draft_saved">Draft saved</string>
+
+    <string name="register_title">Create account</string>
+    <string name="register_subtitle">Sign up to start using EmailClient</string>
+    <string name="register">Sign up</string>
+    <string name="register_prompt">Don\'t have an account? Sign up</string>
+    <string name="register_ok">Account created. Please sign in.</string>
+    <string name="error_password_short">Password must be at least 6 characters</string>
+    <string name="error_email_exists">That email is already registered</string>
 
     <string name="forgot_title">Account recovery</string>
     <string name="forgot_subtitle">Enter your email and we\'ll send you instructions to reset your password</string>

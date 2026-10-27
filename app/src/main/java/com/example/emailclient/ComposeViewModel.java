@@ -9,23 +9,22 @@ import androidx.lifecycle.MutableLiveData;
 
 public class ComposeViewModel extends AndroidViewModel {
 
-    private String draftKey;          // khác null nếu đang sửa một thư nháp
-    private boolean sent = false;     // true nếu đã gửi thành công
-    private boolean initialized = false;
+    private String draftId;
+    private boolean sent;
+    private boolean initialized;
 
     private final MutableLiveData<Boolean> loading = new MutableLiveData<>(false);
-    private final MutableLiveData<Integer> messageRes = new MutableLiveData<>();   // Toast lỗi
-    private final MutableLiveData<Integer> sentMessageRes = new MutableLiveData<>(); // gửi xong: Toast + đóng
+    private final MutableLiveData<Integer> messageRes = new MutableLiveData<>();
+    private final MutableLiveData<Integer> sentMessageRes = new MutableLiveData<>();
 
     public ComposeViewModel(@NonNull Application application) {
         super(application);
     }
 
-    // Chỉ nhận draftKey ở lần đầu; xoay màn hình thì giữ nguyên
-    public void init(String draftKey) {
+    public void init(String draftId) {
         if (initialized) return;
         initialized = true;
-        this.draftKey = draftKey;
+        this.draftId = draftId;
     }
 
     public LiveData<Boolean> getLoading() { return loading; }
@@ -33,7 +32,7 @@ public class ComposeViewModel extends AndroidViewModel {
     public LiveData<Integer> getSentMessageRes() { return sentMessageRes; }
 
     public void send(String to, String subject, String body) {
-        if (Boolean.TRUE.equals(loading.getValue())) return;   // đang gửi, bỏ qua lần bấm thêm
+        if (Boolean.TRUE.equals(loading.getValue())) return;
 
         if (to.isEmpty()) {
             messageRes.setValue(R.string.error_to_required);
@@ -52,7 +51,7 @@ public class ComposeViewModel extends AndroidViewModel {
                         loading.postValue(false);
                         if (Boolean.TRUE.equals(ok)) {
                             sent = true;
-                            if (draftKey != null) EmailRepository.discardDraft(draftKey);
+                            if (draftId != null) MailStore.get(getApplication()).discardDraft(draftId);
                             sentMessageRes.postValue(R.string.sent_ok);
                         } else {
                             messageRes.postValue(R.string.error_send_failed);
@@ -67,20 +66,18 @@ public class ComposeViewModel extends AndroidViewModel {
                 });
     }
 
-    // Gọi khi màn hình đang đóng. Trả về true nếu vừa lưu một bản nháp.
     public boolean onExit(String to, String subject, String body) {
         if (sent) return false;
+        MailStore store = MailStore.get(getApplication());
         if (!to.isEmpty() || !subject.isEmpty() || !body.trim().isEmpty()) {
-            EmailRepository.saveDraft(draftKey, to, subject, body);
+            store.saveDraft(draftId, to, subject, body);
             return true;
-        } else if (draftKey != null) {
-            EmailRepository.discardDraft(draftKey);
+        } else if (draftId != null) {
+            store.discardDraft(draftId);
         }
         return false;
     }
 
-    public void clearMessage() {
-        messageRes.setValue(null); }
-    public void clearSentMessage() {
-        sentMessageRes.setValue(null); }
+    public void clearMessage() { messageRes.setValue(null); }
+    public void clearSentMessage() { sentMessageRes.setValue(null); }
 }
