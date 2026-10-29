@@ -74,11 +74,53 @@
         </LinearLayout>
     </ScrollView>
 
-    <LinearLayout
+        <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="8dp">
+        android:padding="4dp">
+
+        <Button
+            android:id="@+id/btnReply"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="2dp"
+            android:minWidth="0dp"
+            android:paddingStart="2dp"
+            android:paddingEnd="2dp"
+            android:text="@string/reply"
+            android:textSize="12sp"
+            android:textColor="#001D35"
+            android:maxLines="1"
+            android:ellipsize="none"
+            app:autoSizeTextType="uniform"
+            app:autoSizeMinTextSize="8sp"
+            app:autoSizeMaxTextSize="12sp"
+            app:autoSizeStepGranularity="1sp"
+            app:strokeColor="#C2E7FF" />
+
+        <Button
+            android:id="@+id/btnForward"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="2dp"
+            android:minWidth="0dp"
+            android:paddingStart="2dp"
+            android:paddingEnd="2dp"
+            android:text="@string/forward"
+            android:textSize="12sp"
+            android:textColor="#001D35"
+            android:maxLines="1"
+            android:ellipsize="none"
+            app:autoSizeTextType="uniform"
+            app:autoSizeMinTextSize="8sp"
+            app:autoSizeMaxTextSize="12sp"
+            app:autoSizeStepGranularity="1sp"
+            app:strokeColor="#C2E7FF" />
 
         <Button
             android:id="@+id/btnSpam"
@@ -86,9 +128,19 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_margin="4dp"
+            android:layout_margin="2dp"
+            android:minWidth="0dp"
+            android:paddingStart="2dp"
+            android:paddingEnd="2dp"
             android:text="@string/report_spam"
+            android:textSize="12sp"
             android:textColor="#001D35"
+            android:maxLines="1"
+            android:ellipsize="none"
+            app:autoSizeTextType="uniform"
+            app:autoSizeMinTextSize="8sp"
+            app:autoSizeMaxTextSize="12sp"
+            app:autoSizeStepGranularity="1sp"
             app:strokeColor="#C2E7FF" />
 
         <Button
@@ -97,9 +149,20 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_margin="4dp"
+            android:layout_margin="2dp"
+            android:minWidth="0dp"
+            android:paddingStart="2dp"
+            android:paddingEnd="2dp"
             android:text="@string/delete"
+            android:textSize="12sp"
             android:textColor="#001D35"
+            android:maxLines="1"
+            android:ellipsize="none"
+            app:autoSizeTextType="uniform"
+            app:autoSizeMinTextSize="8sp"
+            app:autoSizeMaxTextSize="12sp"
+            app:autoSizeStepGranularity="1sp"
             app:strokeColor="#C2E7FF" />
     </LinearLayout>
+
 </LinearLayout>
