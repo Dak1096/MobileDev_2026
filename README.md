@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Email-Client
 
 Ứng dụng **email client trên Android** (Java + XML layouts). Ứng dụng cho phép đăng nhập, xem hộp thư, đọc chi tiết thư, soạn và gửi thư, đồng thời tự động lưu bản nháp
@@ -563,3 +564,6 @@ Activity / Fragment / Adapter
 | `InboxActivity` | Login | Xem danh sách, chọn thư, soạn thư | MailDetail / Compose |
 | `MailDetailActivity` | Inbox | Xóa / Spam theo ngữ cảnh | Quay lại Inbox |
 | `ComposeActivity` | Inbox | Soạn, gửi, tự lưu nháp | Quay lại Inbox |
+=======
+# MobileDev_2026
+>>>>>>> mobiledev/main
