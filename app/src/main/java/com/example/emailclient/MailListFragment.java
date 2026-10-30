@@ -39,8 +39,10 @@ public class MailListFragment extends Fragment {
         rvMails = view.findViewById(R.id.rvMails);
         rvMails.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        if (getArguments() != null) {
-            folder = getArguments().getString(ARG_FOLDER, "INBOX");
+        Bundle args = getArguments();
+        if (args != null) {
+            String requestedFolder = args.getString(ARG_FOLDER);
+            folder = requestedFolder != null ? requestedFolder : "INBOX";
         }
         return view;
     }

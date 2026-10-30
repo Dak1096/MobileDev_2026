@@ -1,7 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">EmailClient</string>
-    <string name="hint_email">Email</string>
-    <string name="hint_password">Password</string>
+    <string name="hint_email">you@example.com</string>
+    <string name="hint_password">Enter your password</string>
     <string name="login">Login</string>
     <string name="error_email_required">Enter your email</string>
     <string name="error_password_required">Enter your password</string>
@@ -18,6 +19,10 @@
     <string name="menu_drafts">Drafts</string>
     <string name="menu_spam">Spam</string>
     <string name="menu_trash">Trash</string>
+    <string name="menu_sign_out">Sign out</string>
+    <string name="sign_out_title">Sign out?</string>
+    <string name="sign_out_confirmation">You will return to the sign-in screen.</string>
+    <string name="sign_out_confirmation_for_account">Sign out of %1$s?</string>
     <string name="compose_email">Compose email</string>
 
     <string name="compose_title">Compose</string>
@@ -48,4 +53,13 @@
     <string name="check_inbox">Check your email</string>
     <string name="done_message">If an account exists for %1$s, we\'ve sent password reset instructions.</string>
     <string name="error_invalid_email">Please enter a valid email</string>
+
+    <!-- Login screen branding -->
+    <string name="login_brand_name">Posta</string>
+    <string name="login_welcome">Welcome back</string>
+    <string name="login_subtitle">Your inbox is just a moment away.</string>
+    <string name="email_address_label">Email address</string>
+    <string name="password_label">Password</string>
 </resources>
+
+

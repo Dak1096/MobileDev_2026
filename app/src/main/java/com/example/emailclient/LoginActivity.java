@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 public class LoginActivity extends AppCompatActivity {
 
     private LoginViewModel viewModel;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +21,13 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         viewModel = new ViewModelProvider(this).get(LoginViewModel.class);
+        sessionManager = new SessionManager(getApplicationContext());
+
+        String signedInEmail = sessionManager.getSignedInEmail();
+        if (signedInEmail != null) {
+            openInbox(signedInEmail);
+            return;
+        }
 
         EditText etEmail = findViewById(R.id.etEmail);
         EditText etPassword = findViewById(R.id.etPassword);
@@ -53,11 +61,16 @@ public class LoginActivity extends AppCompatActivity {
         viewModel.getLoggedInEmail().observe(this, email -> {
             if (email != null) {
                 viewModel.clearLoggedIn();
-                Intent intent = new Intent(LoginActivity.this, InboxActivity.class);
-                intent.putExtra("email", email);
-                startActivity(intent);
-                finish();
+                sessionManager.saveSignedInEmail(email);
+                openInbox(email);
             }
         });
+    }
+
+    private void openInbox(String email) {
+        Intent intent = new Intent(this, InboxActivity.class);
+        intent.putExtra("email", email);
+        startActivity(intent);
+        finish();
     }
 }

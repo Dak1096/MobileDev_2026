@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Give wider phones a little more space around the form. -->
+    <dimen name="login_screen_padding">24dp</dimen>
+</resources>
+

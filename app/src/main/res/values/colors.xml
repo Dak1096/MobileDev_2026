@@ -5,4 +5,16 @@
     <color name="text_secondary">#5F6368</color>
     <color name="field_border">#DADCE0</color>
     <color name="screen_background">#FFFFFF</color>
+    <color name="mail_icon_background">#2196F3</color>
+
+    <!-- Posta colors are limited to the login screen. -->
+    <color name="posta_primary">#4968E8</color>
+    <color name="posta_ink">#17233C</color>
+    <color name="posta_body">#59677F</color>
+    <color name="posta_muted">#8995A9</color>
+    <color name="posta_hint">#A0AABC</color>
+    <color name="posta_border">#E1E7F0</color>
+    <color name="posta_page">#F6F8FC</color>
+    <color name="posta_white">#FFFFFF</color>
 </resources>
+

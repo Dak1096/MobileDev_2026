@@ -50,10 +50,38 @@
             app:iconTint="#001D35" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/navView"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/drawerPanel"
+        android:layout_width="320dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:menu="@menu/drawer_menu" />
+        android:background="#FFFFFF"
+        android:orientation="vertical">
+
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/navView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="#FFFFFF"
+            app:menu="@menu/drawer_menu" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E8EAED" />
+
+        <TextView
+            android:id="@+id/btnSignOut"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:paddingStart="24dp"
+            android:text="@string/menu_sign_out"
+            android:textColor="#202124"
+            android:textSize="16sp" />
+    </LinearLayout>
 </androidx.drawerlayout.widget.DrawerLayout>

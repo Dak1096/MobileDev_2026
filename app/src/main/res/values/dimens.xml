@@ -1,6 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="screen_padding">24dp</dimen>
     <dimen name="title_text_size">24sp</dimen>
     <dimen name="field_spacing">12dp</dimen>
     <dimen name="title_spacing">32dp</dimen>
+
+    <!-- Screen-edge space for the login form on narrow phones. -->
+    <dimen name="login_screen_padding">20dp</dimen>
 </resources>
